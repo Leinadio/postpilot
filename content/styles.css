@@ -1,0 +1,32 @@
+/* PostPilot trigger button - inline in LinkedIn social action bar */
+.postpilot-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: #0a66c2;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  line-height: 1;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.postpilot-trigger:hover {
+  background: rgba(10, 102, 194, 0.08);
+}
+
+.postpilot-trigger:active {
+  background: rgba(10, 102, 194, 0.15);
+}
+
+.postpilot-trigger-icon {
+  font-size: 14px;
+  line-height: 1;
+}

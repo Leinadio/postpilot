@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup">
+    <div class="header">
+      <span class="logo">✨</span>
+      <h1>PostPilot</h1>
+    </div>
+    <p class="subtitle">Configurez votre clé API Anthropic pour générer des commentaires avec Claude.</p>
+
+    <form id="settings-form">
+      <label for="api-key">Clé API Anthropic</label>
+      <div class="input-group">
+        <input
+          type="password"
+          id="api-key"
+          placeholder="sk-ant-..."
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button type="button" id="toggle-visibility" title="Afficher/masquer">👁</button>
+      </div>
+      <button type="submit" class="save-btn" id="save-btn">Sauvegarder</button>
+    </form>
+
+    <div id="status" class="status"></div>
+
+    <a href="https://console.anthropic.com/settings/keys" target="_blank" class="link">
+      Obtenir une clé API Anthropic &rarr;
+    </a>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
