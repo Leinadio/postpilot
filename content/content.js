@@ -128,17 +128,9 @@
         </div>
         <div class="pp-options">
           <div class="pp-option-row">
-            <span class="pp-option-label">Registre</span>
-            <div class="pp-toggle-group" id="pp-registre">
-              ${Object.entries(REGISTRE_OPTIONS).map(([key, opt]) => `
-                <button class="pp-toggle${key === 'neutre' ? ' active' : ''}" data-value="${key}">${opt.label}</button>
-              `).join('')}
-            </div>
-          </div>
-          <div class="pp-option-row">
-            <span class="pp-option-label">Expression</span>
-            <div class="pp-toggle-group" id="pp-expression">
-              ${Object.entries(EXPRESSION_OPTIONS).map(([key, opt]) => `
+            <span class="pp-option-label">Ton</span>
+            <div class="pp-toggle-group" id="pp-ton">
+              ${Object.entries(TON_OPTIONS).map(([key, opt]) => `
                 <button class="pp-toggle${key === 'neutre' ? ' active' : ''}" data-value="${key}">${opt.label}</button>
               `).join('')}
             </div>
@@ -183,28 +175,19 @@
     `;
 
     let currentType = null;
-    let currentRegistre = 'neutre';
-    let currentExpression = 'neutre';
+    let currentTon = 'neutre';
     let currentLongueur = 'court';
 
     shadow.querySelector('.pp-close').addEventListener('click', () => {
       host.remove(); activePanel = null;
     });
 
-    shadow.getElementById('pp-registre').addEventListener('click', (e) => {
+    shadow.getElementById('pp-ton').addEventListener('click', (e) => {
       const btn = e.target.closest('.pp-toggle');
       if (!btn) return;
-      shadow.querySelectorAll('#pp-registre .pp-toggle').forEach(b => b.classList.remove('active'));
+      shadow.querySelectorAll('#pp-ton .pp-toggle').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      currentRegistre = btn.dataset.value;
-    });
-
-    shadow.getElementById('pp-expression').addEventListener('click', (e) => {
-      const btn = e.target.closest('.pp-toggle');
-      if (!btn) return;
-      shadow.querySelectorAll('#pp-expression .pp-toggle').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentExpression = btn.dataset.value;
+      currentTon = btn.dataset.value;
     });
 
     shadow.getElementById('pp-longueur').addEventListener('click', (e) => {
@@ -220,12 +203,12 @@
         currentType = btn.dataset.type;
         shadow.querySelectorAll('.pp-type-btn').forEach(b => b.classList.remove('selected'));
         btn.classList.add('selected');
-        generateComment(shadow, currentType, postContent, currentRegistre, currentExpression, currentLongueur);
+        generateComment(shadow, currentType, postContent, currentTon, currentLongueur);
       });
     });
 
     shadow.getElementById('pp-regenerate').addEventListener('click', () => {
-      if (currentType) generateComment(shadow, currentType, postContent, currentRegistre, currentExpression, currentLongueur);
+      if (currentType) generateComment(shadow, currentType, postContent, currentTon, currentLongueur);
     });
 
     shadow.getElementById('pp-insert').addEventListener('click', () => {
@@ -235,13 +218,13 @@
     });
 
     shadow.getElementById('pp-retry').addEventListener('click', () => {
-      if (currentType) generateComment(shadow, currentType, postContent, currentRegistre, currentExpression, currentLongueur);
+      if (currentType) generateComment(shadow, currentType, postContent, currentTon, currentLongueur);
     });
 
     return host;
   }
 
-  async function generateComment(shadow, type, postContent, registre, expression, longueur) {
+  async function generateComment(shadow, type, postContent, ton, longueur) {
     const typesGrid = shadow.getElementById('pp-types');
     const resultArea = shadow.getElementById('pp-result');
     const loading = shadow.getElementById('pp-loading');
@@ -254,7 +237,7 @@
     commentBox.style.display = 'none';
     errorBox.style.display = 'none';
 
-    const prompt = buildPrompt(type, postContent, registre, expression, longueur);
+    const prompt = buildPrompt(type, postContent, ton, longueur);
     if (!prompt) return;
 
     try {
