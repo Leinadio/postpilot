@@ -126,23 +126,15 @@
           <span class="pp-title">✨ PostPilot</span>
           <button class="pp-close">&times;</button>
         </div>
-        <div class="pp-options">
-          <div class="pp-option-row">
-            <span class="pp-option-label">Ton</span>
-            <div class="pp-toggle-group" id="pp-ton">
-              ${Object.entries(TON_OPTIONS).map(([key, opt]) => `
-                <button class="pp-toggle${key === 'neutre' ? ' active' : ''}" data-value="${key}">${opt.label}</button>
-              `).join('')}
-            </div>
-          </div>
-        </div>
         <div class="pp-section-label">Approche</div>
         <div class="pp-types" id="pp-types">
           ${Object.entries(COMMENT_APPROACHES).map(([key, approach]) => `
             <button class="pp-type-btn" data-type="${key}">
               <span class="pp-type-emoji">${approach.emoji}</span>
-              <span class="pp-type-label">${approach.label}</span>
-              <span class="pp-type-desc">${approach.description}</span>
+              <span class="pp-type-info">
+                <span class="pp-type-label">${approach.label}</span>
+                <span class="pp-type-desc">${approach.description}</span>
+              </span>
             </button>
           `).join('')}
         </div>
@@ -171,19 +163,8 @@
     `;
 
     let currentType = null;
-    let currentTon = 'neutre';
-
-
     shadow.querySelector('.pp-close').addEventListener('click', () => {
       host.remove(); activePanel = null;
-    });
-
-    shadow.getElementById('pp-ton').addEventListener('click', (e) => {
-      const btn = e.target.closest('.pp-toggle');
-      if (!btn) return;
-      shadow.querySelectorAll('#pp-ton .pp-toggle').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentTon = btn.dataset.value;
     });
 
     shadow.querySelectorAll('.pp-type-btn').forEach(btn => {
@@ -191,22 +172,22 @@
         currentType = btn.dataset.type;
         shadow.querySelectorAll('.pp-type-btn').forEach(b => b.classList.remove('selected'));
         btn.classList.add('selected');
-        generateComment(shadow, currentType, postContent, currentTon);
+        generateComment(shadow, currentType, postContent);
       });
     });
 
     shadow.getElementById('pp-regenerate').addEventListener('click', () => {
-      if (currentType) generateComment(shadow, currentType, postContent, currentTon);
+      if (currentType) generateComment(shadow, currentType, postContent);
     });
 
     shadow.getElementById('pp-shorter').addEventListener('click', () => {
       const comment = shadow.getElementById('pp-comment-text').textContent;
-      if (comment) resizeComment(shadow, 'shorter', comment, postContent, currentTon);
+      if (comment) resizeComment(shadow, 'shorter', comment);
     });
 
     shadow.getElementById('pp-longer').addEventListener('click', () => {
       const comment = shadow.getElementById('pp-comment-text').textContent;
-      if (comment) resizeComment(shadow, 'longer', comment, postContent, currentTon);
+      if (comment) resizeComment(shadow, 'longer', comment);
     });
 
     shadow.getElementById('pp-insert').addEventListener('click', () => {
@@ -216,13 +197,13 @@
     });
 
     shadow.getElementById('pp-retry').addEventListener('click', () => {
-      if (currentType) generateComment(shadow, currentType, postContent, currentTon);
+      if (currentType) generateComment(shadow, currentType, postContent);
     });
 
     return host;
   }
 
-  async function generateComment(shadow, type, postContent, ton) {
+  async function generateComment(shadow, type, postContent) {
     const typesGrid = shadow.getElementById('pp-types');
     const resultArea = shadow.getElementById('pp-result');
     const loading = shadow.getElementById('pp-loading');
@@ -235,7 +216,7 @@
     commentBox.style.display = 'none';
     errorBox.style.display = 'none';
 
-    const prompt = buildPrompt(type, postContent, ton);
+    const prompt = buildPrompt(type, postContent);
     if (!prompt) return;
 
     try {
@@ -260,7 +241,7 @@
     }
   }
 
-  async function resizeComment(shadow, direction, comment, postContent, ton) {
+  async function resizeComment(shadow, direction, comment) {
     const loading = shadow.getElementById('pp-loading');
     const commentBox = shadow.getElementById('pp-comment-box');
     const errorBox = shadow.getElementById('pp-error');
@@ -271,7 +252,7 @@
     commentBox.style.display = 'none';
     errorBox.style.display = 'none';
 
-    const prompt = buildResizePrompt(direction, comment, postContent, ton);
+    const prompt = buildResizePrompt(direction, comment);
 
     try {
       const response = await chrome.runtime.sendMessage({
@@ -376,21 +357,15 @@
       .pp-title { font-size:15px; font-weight:700; color:#0a66c2; }
       .pp-close { background:none; border:none; font-size:22px; color:#666; cursor:pointer; padding:4px 8px; border-radius:4px; }
       .pp-close:hover { background:#f3f3f3; }
-      .pp-options { margin-bottom:12px; display:flex; flex-direction:column; gap:8px; }
-      .pp-option-row { display:flex; align-items:center; gap:10px; }
-      .pp-option-label { font-size:12px; font-weight:600; color:#666; min-width:70px; }
-      .pp-toggle-group { display:flex; gap:4px; }
-      .pp-toggle { padding:5px 12px; border:1px solid #e0e0e0; border-radius:16px; background:#fafafa; font-size:12px; color:#666; cursor:pointer; transition:all .15s; }
-      .pp-toggle:hover { border-color:#0a66c2; color:#0a66c2; }
-      .pp-toggle.active { background:#0a66c2; color:#fff; border-color:#0a66c2; }
       .pp-section-label { font-size:12px; font-weight:600; color:#666; margin-bottom:8px; }
-      .pp-types { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
-      .pp-type-btn { display:flex; flex-direction:column; align-items:center; gap:4px; padding:10px 6px; border:1px solid #e0e0e0; border-radius:8px; background:#fafafa; cursor:pointer; transition:all .15s; }
+      .pp-types { display:flex; flex-direction:column; gap:6px; }
+      .pp-type-btn { display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid #e0e0e0; border-radius:8px; background:#fafafa; cursor:pointer; transition:all .15s; text-align:left; }
       .pp-type-btn:hover { border-color:#0a66c2; background:#f0f7ff; }
       .pp-type-btn.selected { border-color:#0a66c2; background:#e8f0fe; box-shadow:0 0 0 1px #0a66c2; }
-      .pp-type-emoji { font-size:18px; }
-      .pp-type-label { font-size:11px; font-weight:600; color:#333; text-align:center; }
-      .pp-type-desc { font-size:9px; color:#666; text-align:center; line-height:1.3; }
+      .pp-type-emoji { font-size:18px; flex-shrink:0; }
+      .pp-type-info { display:flex; flex-direction:column; gap:1px; }
+      .pp-type-label { font-size:13px; font-weight:600; color:#333; }
+      .pp-type-desc { font-size:11px; color:#666; line-height:1.3; }
       .pp-result { margin-top:12px; }
       .pp-loading { display:flex; align-items:center; justify-content:center; gap:10px; padding:20px; color:#666; font-size:13px; }
       .pp-spinner { width:20px; height:20px; border:2px solid #e0e0e0; border-top-color:#0a66c2; border-radius:50%; animation:ppSpin .8s linear infinite; }
